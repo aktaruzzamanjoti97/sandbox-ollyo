@@ -117,21 +117,25 @@ export default function Home() {
 						Saved Presets
 					</h3>
 					{savedPresets.length > 0 ? (
-						<ul className='space-y-2'>
+						<div className='space-y-2'>
 							{savedPresets.map((preset, index) => (
-								<li
+								<button
 									key={index}
 									onClick={() => handleSelectPreset(preset)}
-									className='text-gray-300 text-sm cursor-pointer hover:text-white hover:bg-gray-700 p-2 rounded transition-colors group relative'
-									title={getPresetInfo(preset)}
+									className={`flex items-center w-full p-3 rounded-lg transition-all duration-200 ${
+										false
+											? 'bg-gray-700 text-white border-l-4 border-blue-500 shadow-md'
+											: 'text-gray-400 hover:bg-gray-700'
+									}`}
 								>
-									<div>{preset.name}</div>
-									<div className='text-xs text-gray-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity'>
-										{getPresetInfo(preset)}
+									<Fan size={20} className='mr-3' />
+									<div className='flex flex-col items-start'>
+										<span className='text-sm'>{preset.name}</span>
+										<span className='text-xs text-gray-500'>{getPresetInfo(preset)}</span>
 									</div>
-								</li>
+								</button>
 							))}
-						</ul>
+						</div>
 					) : (
 						<p className='text-gray-500 text-sm'>Nothing added yet</p>
 					)}

@@ -319,28 +319,24 @@ export default function Home() {
 							<>
 								{/* 3D Light Sphere */}
 
-								<div className='relative w-32 h-49'>
-									<Image
-										src='/off.png'
-										alt='light off'
-										width={128}
-										height={196}
-									/>
-									<div
-										className='absolute inset-0 rounded-full bg-linear-to-br from-gray-600 to-gray-800 shadow-2xl'
-										style={{
-											boxShadow: lightPowerOn
-												? `0 0 ${brightness}px ${getColorTempClass(
-														colorTemp
-												  )
-														.replace('bg-', '')
-														.replace('-400', '')
-														.replace('-300', '')
-														.replace('-500', '')}`
-												: 'none',
-											opacity: lightPowerOn ? brightness / 100 : 0.3,
-										}}
-									></div>
+								<div className='relative w-64 h-49 flex items-center justify-center'>
+									{lightPowerOn ? (
+										<Image
+											src='/lightOn.png'
+											alt='light on'
+											width={228}
+											height={196}
+											
+										/>
+									) : (
+										<Image
+											src='/lightOff.png'
+											alt='light off'
+											width={128}
+											height={196}
+											
+										/>
+									)}
 								</div>
 
 								{/* Light Controls */}

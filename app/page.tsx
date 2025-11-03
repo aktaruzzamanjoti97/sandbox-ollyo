@@ -326,6 +326,7 @@ export default function Home() {
 											alt='light on'
 											width={228}
 											height={196}
+											
 										/>
 									) : (
 										<Image
@@ -333,6 +334,7 @@ export default function Home() {
 											alt='light off'
 											width={128}
 											height={196}
+											
 										/>
 									)}
 								</div>

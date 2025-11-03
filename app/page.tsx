@@ -320,6 +320,12 @@ export default function Home() {
 								{/* 3D Light Sphere */}
 
 								<div className='relative w-32 h-49'>
+									<Image
+										src='/off.png'
+										alt='light off'
+										width={128}
+										height={196}
+									/>
 									<div
 										className='absolute inset-0 rounded-full bg-linear-to-br from-gray-600 to-gray-800 shadow-2xl'
 										style={{
@@ -334,17 +340,7 @@ export default function Home() {
 												: 'none',
 											opacity: lightPowerOn ? brightness / 100 : 0.3,
 										}}
-									>
-										<Image
-											src='/off.png'
-											alt='light off'
-											width={128}
-											height={196}
-										/>
-										{/* <div className='absolute inset-4 rounded-full bg-linear-to-br from-gray-500 to-gray-700'></div>
-										<div className='absolute top-8 left-8 w-16 h-16 rounded-full bg-gray-400 opacity-30 blur-md'></div>
-										<div className='absolute bottom-12 right-12 w-10 h-10 rounded-full bg-gray-400 opacity-20 blur-sm'></div> */}
-									</div>
+									></div>
 								</div>
 
 								{/* Light Controls */}

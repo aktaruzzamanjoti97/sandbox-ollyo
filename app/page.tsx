@@ -144,6 +144,38 @@ export default function Home() {
 		}
 	};
 
+	const getLightShadow = () => {
+		if (!lightPowerOn || brightness === 0) return {};
+
+		// Calculate shadow intensity based on brightness (0-100)
+		const shadowIntensity = brightness / 100;
+		const shadowSize = 20 + shadowIntensity * 60; // 20px to 80px
+		const shadowOpacity = 0.3 + shadowIntensity * 0.5; // 0.3 to 0.8
+
+		// Get shadow color based on color temperature
+		let shadowColor;
+		switch (colorTemp) {
+			case 'warm':
+				shadowColor = `251, 146, 60`; // orange-400
+				break;
+			case 'neutral':
+				shadowColor = `253, 224, 71`; // yellow-300
+				break;
+			case 'cool':
+				shadowColor = `147, 197, 253`; // blue-300
+				break;
+			case 'daylight':
+				shadowColor = `59, 130, 246`; // blue-500
+				break;
+			default:
+				shadowColor = `251, 146, 60`;
+		}
+
+		return {
+			boxShadow: `0 0 ${shadowSize}px rgba(${shadowColor}, ${shadowOpacity})`,
+		};
+	};
+
 	return (
 		<div className='flex h-screen bg-gray-900 text-white font-sans'>
 			{/* Left Sidebar */}
@@ -321,21 +353,23 @@ export default function Home() {
 
 								<div className='relative w-64 h-49 flex items-center justify-center'>
 									{lightPowerOn ? (
-										<Image
-											src='/lightOn.png'
-											alt='light on'
-											width={228}
-											height={196}
-											
-										/>
+										<div style={getLightShadow()}>
+											<Image
+												src='/lightTo.png'
+												alt='light to'
+												width={128}
+												height={196}
+											/>
+										</div>
 									) : (
-										<Image
-											src='/lightOff.png'
-											alt='light off'
-											width={128}
-											height={196}
-											
-										/>
+										<div>
+											<Image
+												src='/lightOff.png'
+												alt='light off'
+												width={128}
+												height={196}
+											/>
+										</div>
 									)}
 								</div>
 

@@ -11,8 +11,19 @@ export default function Home() {
 	const [showModal, setShowModal] = useState(false);
 	const [presetName, setPresetName] = useState('');
 	const [savedPresets, setSavedPresets] = useState<
-		Array<{ name: string; powerOn: boolean; speed: number }>
+		Array<{
+			name: string;
+			powerOn: boolean;
+			speed: number;
+			brightness?: number;
+			colorTemp?: string;
+		}>
 	>([]);
+
+	// Light specific states
+	const [lightPowerOn, setLightPowerOn] = useState(true);
+	const [brightness, setBrightness] = useState(70);
+	const [colorTemp, setColorTemp] = useState('warm');
 
 	// Calculate rotation duration based on speed (0-100)
 	// Speed 0 = stopped, Speed 100 = fastest rotation (0.1 seconds per rotation)
@@ -34,22 +45,41 @@ export default function Home() {
 		setSpeed(0);
 	};
 
+	const handleLightClear = () => {
+		// Reset light settings
+		setLightPowerOn(false);
+		setBrightness(0);
+	};
+
 	const handleSavePreset = () => {
 		// Open the modal
 		setShowModal(true);
 	};
 
 	const handleSavePresetConfirm = () => {
-		// Save the preset with current fan settings
+		// Save the preset with current device settings
 		if (presetName.trim()) {
-			setSavedPresets([
-				...savedPresets,
-				{
-					name: presetName,
-					powerOn: powerOn,
-					speed: speed,
-				},
-			]);
+			if (activeTab === 'fan') {
+				setSavedPresets([
+					...savedPresets,
+					{
+						name: presetName,
+						powerOn: powerOn,
+						speed: speed,
+					},
+				]);
+			} else {
+				setSavedPresets([
+					...savedPresets,
+					{
+						name: presetName,
+						powerOn: lightPowerOn,
+						speed: 0,
+						brightness: brightness,
+						colorTemp: colorTemp,
+					},
+				]);
+			}
 			setPresetName('');
 			setShowModal(false);
 		}
@@ -65,18 +95,53 @@ export default function Home() {
 		name: string;
 		powerOn: boolean;
 		speed: number;
+		brightness?: number;
+		colorTemp?: string;
 	}) => {
 		// Apply the preset settings
-		setPowerOn(preset.powerOn);
-		setSpeed(preset.speed);
+		if (preset.speed > 0) {
+			// This is a fan preset
+			setActiveTab('fan');
+			setPowerOn(preset.powerOn);
+			setSpeed(preset.speed);
+		} else {
+			// This is a light preset
+			setActiveTab('light');
+			setLightPowerOn(preset.powerOn);
+			if (preset.brightness !== undefined) setBrightness(preset.brightness);
+			if (preset.colorTemp !== undefined) setColorTemp(preset.colorTemp);
+		}
 	};
 
 	const getPresetInfo = (preset: {
 		name: string;
 		powerOn: boolean;
 		speed: number;
+		brightness?: number;
+		colorTemp?: string;
 	}) => {
-		return `${preset.powerOn ? 'ON' : 'OFF'} • ${preset.speed}% Speed`;
+		if (preset.speed > 0) {
+			return `${preset.powerOn ? 'ON' : 'OFF'} • ${preset.speed}% Speed`;
+		} else {
+			return `${preset.powerOn ? 'ON' : 'OFF'} • ${
+				preset.brightness
+			}% Brightness`;
+		}
+	};
+
+	const getColorTempClass = (temp: string) => {
+		switch (temp) {
+			case 'warm':
+				return 'bg-orange-400';
+			case 'neutral':
+				return 'bg-yellow-300';
+			case 'cool':
+				return 'bg-blue-300';
+			case 'daylight':
+				return 'bg-blue-500';
+			default:
+				return 'bg-orange-400';
+		}
 	};
 
 	return (
@@ -128,10 +193,16 @@ export default function Home() {
 											: 'text-gray-400 hover:bg-gray-700'
 									}`}
 								>
-									<Fan size={20} className='mr-3' />
+									{preset.speed > 0 ? (
+										<Fan size={20} className='mr-3' />
+									) : (
+										<Lightbulb size={20} className='mr-3' />
+									)}
 									<div className='flex flex-col items-start'>
 										<span className='text-sm'>{preset.name}</span>
-										<span className='text-xs text-gray-500'>{getPresetInfo(preset)}</span>
+										<span className='text-xs text-gray-500'>
+											{getPresetInfo(preset)}
+										</span>
 									</div>
 								</button>
 							))}
@@ -148,24 +219,24 @@ export default function Home() {
 					{/* Canvas Title with Buttons */}
 					<div className='flex justify-between items-center mb-6'>
 						<h1 className='text-2xl font-medium'>
-							{activeTab === 'fan' ? 'Testing Canvas' : 'Drawing Canvas'}
+							{activeTab === 'fan' ? 'Testing Canvas' : '3D Canvas'}
 						</h1>
-						{activeTab === 'fan' && (
-							<div className='flex space-x-3'>
-								<button
-									onClick={handleClear}
-									className='px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
-								>
-									Clear
-								</button>
-								<button
-									onClick={handleSavePreset}
-									className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors'
-								>
-									Save Preset
-								</button>
-							</div>
-						)}
+						<div className='flex space-x-3'>
+							<button
+								onClick={
+									activeTab === 'fan' ? handleClear : handleLightClear
+								}
+								className='px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
+							>
+								Clear
+							</button>
+							<button
+								onClick={handleSavePreset}
+								className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors'
+							>
+								Save Preset
+							</button>
+						</div>
 					</div>
 
 					{/* Canvas Area */}
@@ -245,11 +316,141 @@ export default function Home() {
 								</div>
 							</>
 						) : activeTab === 'light' ? (
-							// Placeholder for Light content
-							<div className='flex flex-col items-center text-gray-500'>
-								<Lightbulb size={64} />
-								<p className='mt-4'>Light Control</p>
-							</div>
+							<>
+								{/* 3D Light Sphere */}
+
+								<div className='relative w-32 h-49'>
+									<div
+										className='absolute inset-0 rounded-full bg-linear-to-br from-gray-600 to-gray-800 shadow-2xl'
+										style={{
+											boxShadow: lightPowerOn
+												? `0 0 ${brightness}px ${getColorTempClass(
+														colorTemp
+												  )
+														.replace('bg-', '')
+														.replace('-400', '')
+														.replace('-300', '')
+														.replace('-500', '')}`
+												: 'none',
+											opacity: lightPowerOn ? brightness / 100 : 0.3,
+										}}
+									>
+										<Image
+											src='/off.png'
+											alt='light off'
+											width={128}
+											height={196}
+										/>
+										{/* <div className='absolute inset-4 rounded-full bg-linear-to-br from-gray-500 to-gray-700'></div>
+										<div className='absolute top-8 left-8 w-16 h-16 rounded-full bg-gray-400 opacity-30 blur-md'></div>
+										<div className='absolute bottom-12 right-12 w-10 h-10 rounded-full bg-gray-400 opacity-20 blur-sm'></div> */}
+									</div>
+								</div>
+
+								{/* Light Controls */}
+								<div className='absolute bottom-0 left-0 right-0 p-6 rounded-b-lg'>
+									<div className='max-w-md mx-auto bg-gray-900 p-6 border border-gray-500 rounded-2xl'>
+										{/* Power Toggle */}
+										<div className='flex items-center justify-between mb-4'>
+											<span className='text-sm font-medium text-gray-300'>
+												Power
+											</span>
+											<button
+												onClick={() =>
+													setLightPowerOn(!lightPowerOn)
+												}
+												className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+													lightPowerOn
+														? 'bg-blue-600'
+														: 'bg-gray-600'
+												}`}
+											>
+												<span
+													className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+														lightPowerOn
+															? 'translate-x-6'
+															: 'translate-x-1'
+													}`}
+												/>
+											</button>
+										</div>
+
+										{/* Color Temperature */}
+										<div className='mb-4'>
+											<span className='text-sm font-medium text-gray-300 block mb-2'>
+												Color Temperature
+											</span>
+											<div className='flex space-x-2'>
+												<button
+													onClick={() => setColorTemp('warm')}
+													className={`w-12 h-12 rounded-lg ${
+														colorTemp === 'warm'
+															? 'ring-2 ring-blue-500'
+															: ''
+													}`}
+												>
+													<div className='w-full h-full bg-orange-400 rounded-lg'></div>
+												</button>
+												<button
+													onClick={() => setColorTemp('neutral')}
+													className={`w-12 h-12 rounded-lg ${
+														colorTemp === 'neutral'
+															? 'ring-2 ring-blue-500'
+															: ''
+													}`}
+												>
+													<div className='w-full h-full bg-yellow-300 rounded-lg'></div>
+												</button>
+												<button
+													onClick={() => setColorTemp('cool')}
+													className={`w-12 h-12 rounded-lg ${
+														colorTemp === 'cool'
+															? 'ring-2 ring-blue-500'
+															: ''
+													}`}
+												>
+													<div className='w-full h-full bg-blue-300 rounded-lg'></div>
+												</button>
+												<button
+													onClick={() => setColorTemp('daylight')}
+													className={`w-12 h-12 rounded-lg ${
+														colorTemp === 'daylight'
+															? 'ring-2 ring-blue-500'
+															: ''
+													}`}
+												>
+													<div className='w-full h-full bg-blue-500 rounded-lg'></div>
+												</button>
+											</div>
+										</div>
+
+										{/* Brightness Slider */}
+										<div className='flex items-center justify-between'>
+											<span className='text-sm font-medium text-gray-300'>
+												Brightness
+											</span>
+											<div className='flex items-center space-x-3 flex-1 ml-8'>
+												<input
+													type='range'
+													min='0'
+													max='100'
+													value={brightness}
+													onChange={(e) =>
+														setBrightness(Number(e.target.value))
+													}
+													className='flex-1 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer'
+													style={{
+														background: `linear-gradient(to right, #3B82F6 0%, #3B82F6 ${brightness}%, #374151 ${brightness}%, #374151 100%)`,
+													}}
+												/>
+												<span className='text-sm text-gray-300 w-12 text-right'>
+													{brightness}%
+												</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</>
 						) : (
 							// Default Fallback
 							<p className='text-gray-500 text-lg'>Drag anything here</p>

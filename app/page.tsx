@@ -149,8 +149,8 @@ export default function Home() {
 
 		// Calculate shadow intensity based on brightness (0-100)
 		const shadowIntensity = brightness / 100;
-		const shadowSize = 20 + shadowIntensity * 60; // 20px to 80px
-		const shadowOpacity = 0.3 + shadowIntensity * 0.5; // 0.3 to 0.8
+		const shadowSize = 20 + shadowIntensity * 80; // 20px to 100px (more dramatic increase)
+		const shadowOpacity = 0.2 + shadowIntensity * 0.7; // 0.2 to 0.9 (brighter shadow)
 
 		// Get shadow color based on color temperature
 		let shadowColor;
@@ -172,7 +172,11 @@ export default function Home() {
 		}
 
 		return {
-			boxShadow: `0 0 ${shadowSize}px rgba(${shadowColor}, ${shadowOpacity})`,
+			boxShadow: `
+				0 0 ${shadowSize}px rgba(${shadowColor}, ${shadowOpacity}),
+				0 0 ${shadowSize * 1.5}px rgba(${shadowColor}, ${shadowOpacity * 0.6}),
+				0 0 ${shadowSize * 2}px rgba(${shadowColor}, ${shadowOpacity * 0.3})
+			`,
 		};
 	};
 

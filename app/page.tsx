@@ -85,7 +85,7 @@ export default function Home() {
                 </div>
 
                 {/* Saved Presets Section */}
-                <div className='mt-auto'>
+                <div className=''>
                     <h3 className='text-sm font-medium text-gray-400 mb-3'>
                         Saved Presets
                     </h3>

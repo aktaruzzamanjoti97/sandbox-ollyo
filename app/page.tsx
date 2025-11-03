@@ -353,12 +353,21 @@ export default function Home() {
 
 								<div className='relative w-64 h-49 flex items-center justify-center'>
 									{lightPowerOn ? (
-										<div style={getLightShadow()}>
+										<div style={getLightShadow()} className='rounded-full'>
 											<Image
 												src='/lightTo.png'
 												alt='light to'
 												width={128}
 												height={196}
+												className='bg-transparent'
+												style={{
+													filter: `brightness(1.2) contrast(1.1) ${
+														brightness > 50
+															? ''
+															: 'brightness(0.8)'
+													}`,
+													mixBlendMode: 'screen',
+												}}
 											/>
 										</div>
 									) : (

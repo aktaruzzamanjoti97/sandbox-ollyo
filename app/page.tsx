@@ -9,6 +9,20 @@ export default function Home() {
 	const [powerOn, setPowerOn] = useState(true);
 	const [speed, setSpeed] = useState(70);
 
+	// Calculate rotation duration based on speed (0-100)
+	// Speed 0 = stopped, Speed 100 = fastest rotation (0.1 seconds per rotation)
+	const getRotationDuration = () => {
+		if (speed === 0 || !powerOn) return 'infinite';
+		// Map speed to duration with much faster rotation:
+		// Speed 1 -> 2s, Speed 50 -> 0.4s, Speed 100 -> 0.1s
+		const duration = Math.max(0.1, 2.01 - (speed * 0.0191));
+		return `${duration}s`;
+	};
+
+	const getAnimationState = () => {
+		return speed === 0 || !powerOn ? 'paused' : 'running';
+	};
+
 	return (
 		<div className='flex h-screen bg-gray-900 text-white font-sans'>
 			{/* Left Sidebar */}
@@ -62,12 +76,20 @@ export default function Home() {
 							<>
 								{/* Fan Crosshair Graphic */}
 								<div className='relative'>
-									<Image
-										src='/fan.png'
-										alt='fan'
-										width={320}
-										height={320}
-									/>
+									<div
+										className='fan-rotating'
+										style={{
+											'--rotation-duration': getRotationDuration(),
+											'--animation-state': getAnimationState(),
+										} as React.CSSProperties}
+									>
+										<Image
+											src='/fan.png'
+											alt='fan'
+											width={320}
+											height={320}
+										/>
+									</div>
 								</div>
 
 								{/* Power and Speed Controls */}
@@ -136,6 +158,20 @@ export default function Home() {
 			</div>
 
 			<style jsx>{`
+				.fan-rotating {
+					animation: rotate var(--rotation-duration) linear infinite;
+					animation-play-state: var(--animation-state);
+				}
+
+				@keyframes rotate {
+					from {
+						transform: rotate(0deg);
+					}
+					to {
+						transform: rotate(360deg);
+					}
+				}
+
 				input[type='range']::-webkit-slider-thumb {
 					appearance: none;
 					width: 16px;

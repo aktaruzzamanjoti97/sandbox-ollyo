@@ -8,6 +8,9 @@ export default function Home() {
     const [activeTab, setActiveTab] = useState('light');
     const [powerOn, setPowerOn] = useState(true);
     const [speed, setSpeed] = useState(70);
+    const [showModal, setShowModal] = useState(false);
+    const [presetName, setPresetName] = useState('');
+    const [savedPresets, setSavedPresets] = useState<string[]>([]);
 
     // Calculate rotation duration based on speed (0-100)
     // Speed 0 = stopped, Speed 100 = fastest rotation (0.1 seconds per rotation)
@@ -30,9 +33,23 @@ export default function Home() {
     };
 
     const handleSavePreset = () => {
-        // Save current settings as preset
-        // In a real app, this would save to a database or local storage
-        alert(`Preset saved: Power ${powerOn ? 'On' : 'Off'}, Speed ${speed}%`);
+        // Open the modal
+        setShowModal(true);
+    };
+
+    const handleSavePresetConfirm = () => {
+        // Save the preset with the entered name
+        if (presetName.trim()) {
+            setSavedPresets([...savedPresets, presetName]);
+            setPresetName('');
+            setShowModal(false);
+        }
+    };
+
+    const handleCancel = () => {
+        // Close the modal without saving
+        setPresetName('');
+        setShowModal(false);
     };
 
     return (
@@ -72,7 +89,20 @@ export default function Home() {
                     <h3 className='text-sm font-medium text-gray-400 mb-3'>
                         Saved Presets
                     </h3>
-                    <p className='text-gray-500 text-sm'>Nothing added yet</p>
+                    {savedPresets.length > 0 ? (
+                        <ul className='space-y-2'>
+                            {savedPresets.map((preset, index) => (
+                                <li
+                                    key={index}
+                                    className='text-gray-300 text-sm cursor-pointer hover:text-white'
+                                >
+                                    {preset}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className='text-gray-500 text-sm'>Nothing added yet</p>
+                    )}
                 </div>
             </div>
 
@@ -188,6 +218,42 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            {/* Save Preset Modal */}
+            {showModal && (
+                <div className='fixed inset-0 bg-gray-900/50 backdrop-blur-sm flex items-center justify-center z-50'>
+                    <div className='bg-gray-800 rounded-xl p-6 w-96 shadow-2xl'>
+                        <h2 className='text-xl font-semibold mb-4'>Give me a name</h2>
+                        
+                        <input
+                            type='text'
+                            placeholder='Name it'
+                            value={presetName}
+                            onChange={(e) => setPresetName(e.target.value)}
+                            className='w-full px-4 py-2 bg-gray-700 rounded-lg mb-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        />
+                        
+                        <p className='text-gray-400 text-sm mb-6'>
+                            By adding this effect as a present you can reuse this anytime.
+                        </p>
+                        
+                        <div className='flex justify-end space-x-3'>
+                            <button
+                                onClick={handleCancel}
+                                className='px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleSavePresetConfirm}
+                                className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors'
+                            >
+                                Save Preset
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <style jsx>{`
                 .fan-rotating {

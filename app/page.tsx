@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 
 export default function Home() {
-	const [activeTab, setActiveTab] = useState('light');
+	const [activeTab, setActiveTab] = useState('');
 	const [powerOn, setPowerOn] = useState(true);
 	const [speed, setSpeed] = useState(70);
 	const [showModal, setShowModal] = useState(false);
@@ -129,21 +129,6 @@ export default function Home() {
 		}
 	};
 
-	const getColorTempClass = (temp: string) => {
-		switch (temp) {
-			case 'warm':
-				return 'bg-orange-400';
-			case 'neutral':
-				return 'bg-yellow-300';
-			case 'cool':
-				return 'bg-blue-300';
-			case 'daylight':
-				return 'bg-blue-500';
-			default:
-				return 'bg-orange-400';
-		}
-	};
-
 	const getLightShadow = () => {
 		if (!lightPowerOn || brightness === 0) return {};
 
@@ -183,7 +168,7 @@ export default function Home() {
 	return (
 		<div className='flex h-screen bg-gray-900 text-white font-sans'>
 			{/* Left Sidebar */}
-			<div className='w-64 bg-gray-800 p-6 flex flex-col'>
+			<div className='w-64 bg-[#101828] p-6 flex flex-col'>
 				<h2 className='text-xl font-semibold mb-6'>Devices</h2>
 
 				{/* Navigation Options */}
@@ -250,33 +235,35 @@ export default function Home() {
 			</div>
 
 			{/* Main Canvas Area */}
-			<div className='flex-1 p-6'>
+			<div className='flex-1 p-6 bg-[#030712]'>
 				<div className='h-full flex flex-col'>
 					{/* Canvas Title with Buttons */}
 					<div className='flex justify-between items-center mb-6'>
 						<h1 className='text-2xl font-medium'>
 							{activeTab === 'fan' ? 'Testing Canvas' : '3D Canvas'}
 						</h1>
-						<div className='flex space-x-3'>
-							<button
-								onClick={
-									activeTab === 'fan' ? handleClear : handleLightClear
-								}
-								className='px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
-							>
-								Clear
-							</button>
-							<button
-								onClick={handleSavePreset}
-								className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors'
-							>
-								Save Preset
-							</button>
-						</div>
+						{activeTab && (
+							<div className='flex space-x-3'>
+								<button
+									onClick={
+										activeTab === 'fan' ? handleClear : handleLightClear
+									}
+									className='px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors'
+								>
+									Clear
+								</button>
+								<button
+									onClick={handleSavePreset}
+									className='px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors'
+								>
+									Save Preset
+								</button>
+							</div>
+						)}
 					</div>
 
 					{/* Canvas Area */}
-					<div className='flex-1 bg-gray-800 rounded-lg border-2 border-dashed border-gray-700 flex items-center justify-center relative'>
+					<div className='flex-1 bg-[#0A101D] rounded-lg border-2 border-dashed border-gray-700 flex items-center justify-center relative'>
 						{activeTab === 'fan' ? (
 							<>
 								{/* Fan Crosshair Graphic */}
@@ -357,7 +344,10 @@ export default function Home() {
 
 								<div className='relative w-64 h-49 flex items-center justify-center'>
 									{lightPowerOn ? (
-										<div style={getLightShadow()} className='rounded-full'>
+										<div
+											style={getLightShadow()}
+											className='rounded-full'
+										>
 											<Image
 												src='/lightTo.png'
 												alt='light to'

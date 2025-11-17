@@ -23,7 +23,7 @@ export default function Home() {
     // Preset management
     const { presets, savePreset, getPresetInfo } = usePresets();
 
-    // Keep track of current device states for presets
+    // Keep track of current device
     const [fanState, setFanState] = useState<FanState>({ powerOn: true, speed: 70 });
     const [lightState, setLightState] = useState<LightState>({
         powerOn: true,

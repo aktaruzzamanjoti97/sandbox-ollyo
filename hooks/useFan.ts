@@ -16,7 +16,7 @@ export const useFan = (initialState?: Partial<FanState>) => {
 
   const getRotationDuration = () => {
     if (speed === 0 || !powerOn) return 'infinite';
-    // Map speed to duration: Speed 1 -> 2s, Speed 50 -> 0.4s, Speed 100 -> 0.1s
+    
     const duration = Math.max(0.1, 2.01 - speed * 0.0191);
     return `${duration}s`;
   };
